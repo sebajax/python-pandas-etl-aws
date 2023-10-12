@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "python-pandas-etl-aws"
+version = "0.1.0"
+description = ""
+authors = ["Sebastian Ituarte <sebastian.ituarte@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.11.5,<3.13"
+pandas = "^2.1.1"
+openpyxl = "^3.1.2"
+pandera = "^0.17.2"
+pandas-schema = "^0.3.6"
+pydantic = "^2.4.2"
+pymongo = "^4.5.0"
+pydantic-settings = "^2.0.3"
+
+[tool.poetry.group.dev.dependencies]
+flake8 = "^5.0.4"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
