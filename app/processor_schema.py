@@ -1,25 +1,21 @@
 """
-pandera schemas definition for process
+pydantic schemas definition for process
 """
-import datetime
-from datetime import date
-
-import pandera as pa
-from pandera import Column, DataFrameSchema, Check, Index
-
-from pydantic import BaseModel, Field, ValidationError
-
-batch_process_schema = DataFrameSchema(
-    {
-        "Date": Column(pa.DateTime, nullable=False),
-        "Customer": Column(pa.String, nullable=False),
-        "Sales": Column(pa.Int, Check.greater_than_or_equal_to(0), nullable=False)
-    },
-    index=Index(int),
-)
-
+from typing import Optional
+from pydantic import BaseModel, Field, ValidationError, validator
 
 class BatchProcessSchema(BaseModel):
-    Date: datetime.datetime
-    Customer: str
-    Sales: int = Field(ge=0)
+    Cod: str = Field(min_length=1)
+    Fecha: int = Field(gt=0)
+    Tipo: str = Field(min_length=1)
+    Marca: str = Field(min_length=1)
+    Modelo: str | None = None
+    Version: str | None = None
+    Puertas: str | None = None
+    Combustible: str | None = None
+    Transmision: str | None = None
+    Marchas: str | None = None
+    Traccion: str | None = None
+    Pais: str | None = None
+    Tasacion: float = Field(gt=0)
+    Permiso: float = Field(gt=0)

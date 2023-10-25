@@ -12,6 +12,7 @@ from db import ok_data_collection, error_data_collection
 # get root logger
 logger = logging.getLogger(__name__)
 
+
 @dataclass
 class BatchProcessService:
     """
@@ -36,10 +37,14 @@ class BatchProcessService:
         :rtype: ResponseService
         """
         # read excel and transform into a data frame
-        df = pd.read_excel(self.file)
+        df = pd.read_excel(self.file, na_filter=False)
+        # remove unnamed columns & transform all elements to string
+        df = df[df.filter(regex='^(?!Unnamed)').columns].map(str)
 
-        # data frame with errors
-        df_error = pd.DataFrame(columns=["Date", "Customer", "Sales", "Error"])
+        # generate data frame with errors using head columns from process dataframe
+        error_columns = df.columns.values.tolist()
+        error_columns.append("Error")
+        df_error = pd.DataFrame(columns=error_columns)
 
         # iterate through the DataFrame and validate each row
         for index, row in df.iterrows():
@@ -55,7 +60,7 @@ class BatchProcessService:
             # df_error['Date'] = pd.to_datetime(df_error['Date'])
             df_error.to_dict('records')
             error_data_collection.insert_many(df_error.to_dict('records'))
-            df_error.to_excel("Errors.xlsx", index=False)
+            df_error.to_excel("errors.xlsx", index=False)
 
         # insert correct ones if we have any
         if len(df) > 0:
