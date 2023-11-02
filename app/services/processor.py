@@ -1,18 +1,20 @@
 # module import
 import io
-import pandas as pd
-from dataclasses import dataclass
 import logging
+from dataclasses import dataclass
+
+import pandas as pd
+from pydantic import ValidationError
 
 # infrastructure import
-from bucket_infrastructure import BucketInfrastructure
-# service import
-from response_service import ResponseService
-from exception_service import ServiceException
+from infrastructure.bucket_infrastructure import BucketInfrastructure
+from infrastructure.repository_infrastructure import RepositoryInfrastructure
 # schema import
-from processor_schema import BatchProcessSchema, ValidationError
-# db import
-from db import ok_data_collection, error_data_collection
+from schemas.processor_schema import BatchProcessSchema
+from services.exception_service import ServiceException
+# service import
+from services.response_service import ResponseService
+
 # get root logger
 logger = logging.getLogger(__name__)
 
@@ -24,6 +26,7 @@ class BatchProcessService:
     """
     file: str
     bucket_infrastructure: BucketInfrastructure
+    repository_infrastructure: RepositoryInfrastructure
 
     @classmethod
     def __validate(cls, data: dict) -> pd.Series | None:
@@ -32,7 +35,7 @@ class BatchProcessService:
             BatchProcessSchema(**data)
             return None
         except ValidationError as e:
-            print(str(e))
+            logger.error("validation error %s", str(e))
             return pd.Series({**data, "Error": str(e)})
 
     @classmethod
@@ -52,7 +55,6 @@ class BatchProcessService:
         :rtype: ResponseService
         """
         try:
-
             # get the Excel file in bytes
             data = self.bucket_infrastructure.get_file_from_bucket()
             if data is None:
@@ -81,7 +83,8 @@ class BatchProcessService:
             if len(df_error) > 0:
                 # df_error['Date'] = pd.to_datetime(df_error['Date'])
                 df_error.to_dict('records')
-                error_data_collection.insert_many(df_error.to_dict('records'))
+                (self.repository_infrastructure.error_data_collection()
+                 .insert_many(df_error.to_dict('records')))
                 # transform error data frame into byte array
                 xlsx_data = self.__transform_data(df_error)
                 # write excel into s3 bucket
@@ -90,7 +93,8 @@ class BatchProcessService:
             # insert correct ones if we have any
             if len(df) > 0:
                 df.to_dict('records')
-                ok_data_collection.insert_many(df.to_dict('records'))
+                (self.repository_infrastructure.ok_data_collection()
+                 .insert_many(df.to_dict('records')))
 
             # df['json'] = df.apply(lambda x: x.to_json(), axis=1)
 
@@ -106,4 +110,3 @@ class BatchProcessService:
         except Exception as e:
             logger.error("process error %s", e)
             raise ServiceException(detail="PROCESS_ERROR")
-

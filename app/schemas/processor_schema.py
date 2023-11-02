@@ -1,8 +1,8 @@
 """
 pydantic schemas definition for process
 """
-from typing import Optional
-from pydantic import BaseModel, Field, ValidationError, validator
+from pydantic import BaseModel, Field
+
 
 class BatchProcessSchema(BaseModel):
     Cod: str = Field(min_length=1)

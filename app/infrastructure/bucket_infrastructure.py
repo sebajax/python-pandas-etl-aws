@@ -1,11 +1,15 @@
 # module import
 import io
+import logging
 from dataclasses import dataclass
 
 import boto3
 
 # config import
-from config import get_settings
+from infrastructure.config import get_settings
+
+# get root logger
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -34,7 +38,7 @@ class BucketInfrastructure:
             # get the file from the bucket
             obj = s3.get_object(Bucket=bucket_name, Key=object_key)
             data = obj['Body'].read()
-            print(f"file loaded successfully from bucket {object_key}")
+            logger.info("file loaded successfully from bucket %s", object_key)
             # return the file into an array of bytes to transform the data into a dataframe
             return io.BytesIO(data)
         except Exception as e:
@@ -51,7 +55,7 @@ class BucketInfrastructure:
         try:
             # write the bytes into a file to the bucket
             s3.put_object(Bucket=bucket_name, Key=object_key, Body=xlsx_data)
-            print(f"error file written successfully into bucket {object_key}")
+            logger.info("error file written successfully into bucket %s", object_key)
         except Exception as e:
-            print(e)
+            logger.error("process error %s", e)
             return None

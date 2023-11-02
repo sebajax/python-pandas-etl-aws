@@ -1,17 +1,17 @@
 """
-core configuration for api
+infrastructure configuration for api
 """
 
 from functools import lru_cache
 from typing import Optional
 
-from pydantic import Field, MongoDsn
+from pydantic import Field
 from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
     """
-    class to represent the core settings for the api
+    class to represent the infrastructure settings for the api
     """
     # batch env variables
     PROJECT_NAME: str = Field(env="PROJECT_NAME")
@@ -36,18 +36,17 @@ class Settings(BaseSettings):
 
     def assemble_db_connection(self) -> str:
         """
-        function that returns the mongo db connection string
-        :return: connection string
+        :return: function that returns the mongo db connection string
         :rtype: str
         """
-        return f"mongodb://{self.MONGO_USER}:{self.MONGO_PASS}@{self.MONGO_SERVER}:{self.MONGO_PORT}"
+        return (f"mongodb://{self.MONGO_USER}:{self.MONGO_PASS}"
+                f"@{self.MONGO_SERVER}:{self.MONGO_PORT}")
 
 
 @lru_cache
 def get_settings() -> Settings:
     """
-    function to generate settings instance and cache the setting using decorator
-    :return: settings
+    :return: function to generate settings instance and cache the setting using decorator
     :rtype: Settings
     """
     return Settings()
