@@ -34,4 +34,4 @@ COPY ./logging.conf /code/logging.conf
 COPY ./liv2023.xlsx /code/liv2023.xlsx
 
 # CMD ["python", "app/main.py", "'https://docs.google.com/spreadsheets/export?id=1jPihN-m_vUet2qsuXGBpqsslCmNPzNm4&format=xlsx'"]
-CMD ["python", "app/main.py", "liv2023.xlsx"]
+# CMD ["python", "app/main.py", "liv2023_min.xlsx"]

@@ -23,6 +23,10 @@ class Settings(BaseSettings):
     MONGO_PASS: str = Field(env="MONGO_PASS")
     MONGO_DB: str = Field(env="MONGO_DB")
     MONGO_PORT: int = Field(env="MONGO_PORT")
+    # bucket env variables
+    AWS_ACCESS_KEY: str = Field(env="AWS_ACCESS_KEY")
+    AWS_SECRET_KEY: str = Field(env="AWS_SECRET_KEY")
+    AWS_BUCKET_NAME: str = Field(env="AWS_BUCKET_NAME")
 
     class Config:
         """
