@@ -39,8 +39,8 @@ class Settings(BaseSettings):
         :return: function that returns the mongo db connection string
         :rtype: str
         """
-        return (f"mongodb://{self.MONGO_USER}:{self.MONGO_PASS}"
-                f"@{self.MONGO_SERVER}:{self.MONGO_PORT}")
+        mongo_uri = "mongodb+srv" if self.ENV == "test" else "mongodb"
+        return f"{mongo_uri}://{self.MONGO_USER}:{self.MONGO_PASS}@{self.MONGO_SERVER}"
 
 
 @lru_cache

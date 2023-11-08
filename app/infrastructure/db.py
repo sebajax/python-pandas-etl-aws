@@ -11,4 +11,5 @@ def connect():
     :return: database session
     :rtype: Generator
     """
+    # create a new client and connect to the server
     return pymongo.MongoClient(get_settings().assemble_db_connection())
